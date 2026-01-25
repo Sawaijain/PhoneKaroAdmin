@@ -30,9 +30,9 @@ const apiCall = async <T>(
   options: RequestInit = {}
 ): Promise<T> => {
   const token = getToken();
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   if (token) {
@@ -81,8 +81,33 @@ export const getPatientById = async (id: string): Promise<PatientDetailResponse>
 };
 
 // Get all drivers
-export const getAllDrivers = async (): Promise<DriversResponse> => {
-  return apiCall<DriversResponse>('/driver/getAllDrivers', {
+export const getAllDrivers = async (
+  params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    isAvailable?: boolean;
+  }
+): Promise<DriversResponse> => {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.page !== undefined) {
+    queryParams.append('page', params.page.toString());
+  }
+  if (params?.limit !== undefined) {
+    queryParams.append('limit', params.limit.toString());
+  }
+  if (params?.search) {
+    queryParams.append('search', params.search);
+  }
+  if (params?.isAvailable !== undefined) {
+    queryParams.append('isAvailable', params.isAvailable.toString());
+  }
+
+  const queryString = queryParams.toString();
+  const endpoint = `/driver/getAllDrivers${queryString ? `?${queryString}` : ''}`;
+
+  return apiCall<DriversResponse>(endpoint, {
     method: 'GET',
   });
 };
@@ -91,5 +116,26 @@ export const getAllDrivers = async (): Promise<DriversResponse> => {
 export const getDriverById = async (id: string): Promise<DriverDetailResponse> => {
   return apiCall<DriverDetailResponse>(`/driver/getdriverById?id=${id}`, {
     method: 'GET',
+  });
+};
+
+// Update driver approval status
+export interface UpdateDriverApprovalRequest {
+  id: string;
+  isApproved: boolean;
+}
+
+export interface UpdateDriverApprovalResponse {
+  code: number;
+  message: string;
+  data?: any;
+}
+
+export const updateDriverApprovalStatus = async (
+  request: UpdateDriverApprovalRequest
+): Promise<UpdateDriverApprovalResponse> => {
+  return apiCall<UpdateDriverApprovalResponse>('/driver/updateDriverApprovalstatus', {
+    method: 'PUT',
+    body: JSON.stringify(request),
   });
 };

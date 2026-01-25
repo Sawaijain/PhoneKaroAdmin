@@ -64,6 +64,7 @@ export interface Driver {
   notification_id: string | null;
   ambulances: Ambulance[];
   createdAt: string;
+  isApproved:boolean;
   updatedAt: string;
   __v: number;
   location?: {

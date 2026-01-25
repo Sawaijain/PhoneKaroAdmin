@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getDriverById } from '../services/api';
+import { getDriverById, updateDriverApprovalStatus } from '../services/api';
 import type { Driver } from '../types';
 import Layout from '../components/Layout';
 import ImageViewer from '../components/ImageViewer';
@@ -12,6 +12,7 @@ const DriverDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [viewingImage, setViewingImage] = useState<{ url: string; title: string } | null>(null);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -48,6 +49,25 @@ const DriverDetail: React.FC = () => {
     }
   };
 
+  const handleApprovalStatusChange = async (isApproved: boolean) => {
+    if (!driver || !id) return;
+
+    try {
+      setUpdating(true);
+      setError('');
+      await updateDriverApprovalStatus({
+        id: id,
+        isApproved: isApproved,
+      });
+      // Refresh driver details after approval status change
+      await fetchDriverDetails();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update approval status');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   return (
     <Layout>
       <div>
@@ -72,7 +92,35 @@ const DriverDetail: React.FC = () => {
               </svg>
               Back to Drivers
             </button>
-            <h1 className="text-3xl font-bold text-gray-900">Driver Details</h1>
+            <div className="flex items-center gap-4">
+              <h1 className="text-3xl font-bold text-gray-900">Driver Details</h1>
+              {driver && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleApprovalStatusChange(true)}
+                    disabled={updating || driver.isApproved}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      driver.isApproved
+                        ? 'bg-green-100 text-green-800 cursor-not-allowed'
+                        : 'bg-green-600 text-white hover:bg-green-700'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {updating ? 'Updating...' : 'Approve'}
+                  </button>
+                  <button
+                    onClick={() => handleApprovalStatusChange(false)}
+                    disabled={updating || !driver.isApproved}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      !driver.isApproved
+                        ? 'bg-red-100 text-red-800 cursor-not-allowed'
+                        : 'bg-red-600 text-white hover:bg-red-700'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {updating ? 'Updating...' : 'Reject'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
