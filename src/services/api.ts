@@ -7,7 +7,7 @@ import type {
   DriverDetailResponse,
 } from '../types';
 
-const API_BASE_URL = 'https://ec2-13-49-244-247.eu-north-1.compute.amazonaws.com/api/v1';
+const API_BASE_URL = 'https://api.gyankunjkutir.com/api/v1/';
 
 // Get token from localStorage
 export const getToken = (): string | null => {
