@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllDrivers } from '../services/api';
+import { getAllDrivers, deleteDriver } from '../services/api';
 import type { Driver } from '../types';
 
 const Drivers: React.FC = () => {
@@ -71,6 +71,22 @@ const Drivers: React.FC = () => {
 
   const handleRowClick = (driverId: string) => {
     navigate(`/drivers/${driverId}`);
+  };
+
+  const handleDelete = async (e: React.MouseEvent, driverId: string) => {
+    e.stopPropagation(); // Prevent row click when clicking delete button
+    
+    if (!window.confirm('Are you sure you want to delete this driver?')) {
+      return;
+    }
+
+    try {
+      await deleteDriver(driverId);
+      // Refresh the list after deletion
+      fetchDrivers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete driver');
+    }
   };
 
   // Generate page numbers for pagination
@@ -188,12 +204,15 @@ console.log("drivers",drivers);
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Account Status
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {drivers.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                      <td colSpan={8} className="px-6 py-4 text-center text-sm text-gray-500">
                         No drivers found
                       </td>
                     </tr>
@@ -232,6 +251,14 @@ console.log("drivers",drivers);
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {driver.isApproved ? 'Approved' : 'Pending'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <button
+                            onClick={(e) => handleDelete(e, driver._id)}
+                            className="text-red-600 hover:text-red-900 font-medium"
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))

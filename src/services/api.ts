@@ -172,3 +172,23 @@ export const getAllRides = async (
     method: 'GET',
   });
 };
+
+// Delete patient
+export interface DeleteResponse {
+  code: number;
+  message: string;
+  data?: any;
+}
+
+export const deletePatient = async (id: string): Promise<DeleteResponse> => {
+  return apiCall<DeleteResponse>(`/patient/deletepatient?id=${id}`, {
+    method: 'DELETE',
+  });
+};
+
+// Delete driver
+export const deleteDriver = async (id: string): Promise<DeleteResponse> => {
+  return apiCall<DeleteResponse>(`/driver/deleteDriver?id=${id}`, {
+    method: 'DELETE',
+  });
+};

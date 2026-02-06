@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllPatients } from '../services/api';
+import { getAllPatients, deletePatient } from '../services/api';
 import type { Patient } from '../types';
 
 const Patients: React.FC = () => {
@@ -28,6 +28,22 @@ const Patients: React.FC = () => {
 
   const handleRowClick = (patientId: string) => {
     navigate(`/patients/${patientId}`);
+  };
+
+  const handleDelete = async (e: React.MouseEvent, patientId: string) => {
+    e.stopPropagation(); // Prevent row click when clicking delete button
+    
+    if (!window.confirm('Are you sure you want to delete this patient?')) {
+      return;
+    }
+
+    try {
+      await deletePatient(patientId);
+      // Refresh the list after deletion
+      fetchPatients();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete patient');
+    }
   };
 
   const formatDate = (dateString: string | null) => {
@@ -80,6 +96,9 @@ const Patients: React.FC = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Ref Code
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -106,6 +125,14 @@ const Patients: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {patient.refCode || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <button
+                        onClick={(e) => handleDelete(e, patient._id)}
+                        className="text-red-600 hover:text-red-900 font-medium"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
