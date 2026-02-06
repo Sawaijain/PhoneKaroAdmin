@@ -7,6 +7,7 @@ import Patients from './pages/Patients';
 import PatientDetail from './pages/PatientDetail';
 import Drivers from './pages/Drivers';
 import DriverDetail from './pages/DriverDetail';
+import Rides from './pages/Rides';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -55,6 +56,16 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <DriverDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/rides"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Rides />
+            </Layout>
           </ProtectedRoute>
         }
       />

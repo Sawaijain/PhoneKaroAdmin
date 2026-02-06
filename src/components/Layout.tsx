@@ -80,6 +80,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               Drivers
             </Link>
 
+            <Link
+              to="/rides"
+              className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
+                isActive('/rides')
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-gray-300 hover:bg-gray-800'
+              }`}
+            >
+              <svg
+                className="w-5 h-5 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                />
+              </svg>
+              Rides
+            </Link>
+
             <button
               onClick={handleLogout}
               className="w-full flex items-center px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"

@@ -112,3 +112,35 @@ export interface DriverDetailResponse {
   message: string;
   data: Driver[];
 }
+
+export interface DriverDetails {
+  driverName: string;
+  email: string;
+  phoneNumber: string;
+  driverProfile: string;
+  location?: {
+    type: string;
+    coordinates: number[];
+  };
+}
+
+export interface PatientDetails {
+  patientName: string;
+  email: string;
+  phoneNumber: string;
+}
+
+export interface Ride {
+  _id: string;
+  rideStatus: string;
+  orderId: string;
+  createdAt: string;
+  driverDetails?: DriverDetails;
+  patientDetails: PatientDetails;
+}
+
+export interface RidesResponse {
+  code: number;
+  message: string;
+  data: Ride[];
+}

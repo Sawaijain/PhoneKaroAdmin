@@ -5,6 +5,7 @@ import type {
   DriversResponse,
   PatientDetailResponse,
   DriverDetailResponse,
+  RidesResponse,
 } from '../types';
 
 const API_BASE_URL = 'https://api.gyankunjkutir.com/api/v1';
@@ -137,5 +138,37 @@ export const updateDriverApprovalStatus = async (
   return apiCall<UpdateDriverApprovalResponse>('/driver/updateDriverApprovalstatus', {
     method: 'PUT',
     body: JSON.stringify(request),
+  });
+};
+
+// Get all rides
+export const getAllRides = async (
+  params?: {
+    search?: string;
+    rideStatus?: string;
+    fromDate?: string;
+    toDate?: string;
+  }
+): Promise<RidesResponse> => {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.search) {
+    queryParams.append('search', params.search);
+  }
+  if (params?.rideStatus) {
+    queryParams.append('rideStatus', params.rideStatus);
+  }
+  if (params?.fromDate) {
+    queryParams.append('fromDate', params.fromDate);
+  }
+  if (params?.toDate) {
+    queryParams.append('toDate', params.toDate);
+  }
+
+  const queryString = queryParams.toString();
+  const endpoint = `/rideOrder/getAllRides${queryString ? `?${queryString}` : ''}`;
+
+  return apiCall<RidesResponse>(endpoint, {
+    method: 'GET',
   });
 };
