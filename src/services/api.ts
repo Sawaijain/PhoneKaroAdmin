@@ -12,39 +12,39 @@ import type {
   Coupon,
   CouponsResponse,
   CouponDetailResponse,
-} from '../types';
+} from "../types";
 
-const API_BASE_URL = 'https://api.gyankunjkutir.com/api/v1';
-const ROOT_API_URL = "https://api.gyankunjkutir.com/api/v1";
+const API_BASE_URL = "https://api.phonekar.com/api/v1";
+const ROOT_API_URL = "https://api.phonekar.com/api/v1";
 
 // Get token from localStorage
 export const getToken = (): string | null => {
-  return localStorage.getItem('admin_token');
+  return localStorage.getItem("admin_token");
 };
 
 // Set token in localStorage
 export const setToken = (token: string): void => {
-  localStorage.setItem('admin_token', token);
+  localStorage.setItem("admin_token", token);
 };
 
 // Remove token from localStorage
 export const removeToken = (): void => {
-  localStorage.removeItem('admin_token');
+  localStorage.removeItem("admin_token");
 };
 
 // Helper function to make API calls
 const apiCall = async <T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> => {
   const token = getToken();
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
   };
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -53,23 +53,28 @@ const apiCall = async <T>(
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(error.message || 'Request failed');
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Request failed" }));
+    throw new Error(error.message || "Request failed");
   }
 
   return response.json();
 };
 
 // Helper for root (non-/api/v1) endpoints like coupons
-const rootApiCall = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
+const rootApiCall = async <T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> => {
   const token = getToken();
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
   };
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   const response = await fetch(`${ROOT_API_URL}${path}`, {
@@ -78,17 +83,21 @@ const rootApiCall = async <T>(path: string, options: RequestInit = {}): Promise<
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(error.message || 'Request failed');
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Request failed" }));
+    throw new Error(error.message || "Request failed");
   }
 
   return response.json();
 };
 
 // Login API
-export const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
-  const response = await apiCall<LoginResponse>('/admin/login', {
-    method: 'POST',
+export const login = async (
+  credentials: LoginRequest,
+): Promise<LoginResponse> => {
+  const response = await apiCall<LoginResponse>("/admin/login", {
+    method: "POST",
     body: JSON.stringify(credentials),
   });
 
@@ -105,62 +114,65 @@ export const getAllPatients = async (params?: {
   toDate?: string;
 }): Promise<PatientsResponse> => {
   const queryParams = new URLSearchParams();
-  if (params?.fromDate) queryParams.append('fromDate', params.fromDate);
-  if (params?.toDate) queryParams.append('toDate', params.toDate);
+  if (params?.fromDate) queryParams.append("fromDate", params.fromDate);
+  if (params?.toDate) queryParams.append("toDate", params.toDate);
   const qs = queryParams.toString();
-  return apiCall<PatientsResponse>(`/patient/getAllPatient${qs ? `?${qs}` : ''}`, {
-    method: 'GET',
-  });
+  return apiCall<PatientsResponse>(
+    `/patient/getAllPatient${qs ? `?${qs}` : ""}`,
+    {
+      method: "GET",
+    },
+  );
 };
 
 // Get patient by ID
-export const getPatientById = async (id: string): Promise<PatientDetailResponse> => {
+export const getPatientById = async (
+  id: string,
+): Promise<PatientDetailResponse> => {
   return apiCall<PatientDetailResponse>(`/patient/getpatientById?id=${id}`, {
-    method: 'GET',
+    method: "GET",
   });
 };
 
 // Get all drivers
-export const getAllDrivers = async (
-  params?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    isAvailable?: boolean;
-    isApproved?: boolean;
-    fromDate?: string;
-    toDate?: string;
-  }
-): Promise<DriversResponse> => {
+export const getAllDrivers = async (params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  isAvailable?: boolean;
+  isApproved?: boolean;
+  fromDate?: string;
+  toDate?: string;
+}): Promise<DriversResponse> => {
   const queryParams = new URLSearchParams();
 
   if (params?.page !== undefined) {
-    queryParams.append('page', params.page.toString());
+    queryParams.append("page", params.page.toString());
   }
   if (params?.limit !== undefined) {
-    queryParams.append('limit', params.limit.toString());
+    queryParams.append("limit", params.limit.toString());
   }
   if (params?.search) {
-    queryParams.append('search', params.search);
+    queryParams.append("search", params.search);
   }
   if (params?.isAvailable !== undefined) {
-    queryParams.append('isAvailable', params.isAvailable.toString());
+    queryParams.append("isAvailable", params.isAvailable.toString());
   }
   if (params?.isApproved !== undefined) {
-    queryParams.append('isApproved', params.isApproved.toString());
+    queryParams.append("isApproved", params.isApproved.toString());
   }
   if (params?.fromDate) {
-    queryParams.append('fromDate', params.fromDate);
+    queryParams.append("fromDate", params.fromDate);
   }
   if (params?.toDate) {
-    queryParams.append('toDate', params.toDate);
+    queryParams.append("toDate", params.toDate);
   }
 
   const queryString = queryParams.toString();
-  const endpoint = `/driver/getAllDrivers${queryString ? `?${queryString}` : ''}`;
+  const endpoint = `/driver/getAllDrivers${queryString ? `?${queryString}` : ""}`;
 
   return apiCall<DriversResponse>(endpoint, {
-    method: 'GET',
+    method: "GET",
   });
 };
 
@@ -170,14 +182,18 @@ export const getAllDriversList = async (): Promise<DriversResponse> => {
 };
 
 // Get driver by ID
-export const getDriverById = async (id: string): Promise<DriverDetailResponse> => {
+export const getDriverById = async (
+  id: string,
+): Promise<DriverDetailResponse> => {
   return apiCall<DriverDetailResponse>(`/driver/getdriverById?id=${id}`, {
-    method: 'GET',
+    method: "GET",
   });
 };
 
 // --- Reports (file downloads) ---
-const getFilenameFromContentDisposition = (value: string | null): string | null => {
+const getFilenameFromContentDisposition = (
+  value: string | null,
+): string | null => {
   if (!value) return null;
   // Supports: attachment; filename="x.csv" OR filename*=UTF-8''x.csv
   const filenameStarMatch = value.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
@@ -193,25 +209,27 @@ const getFilenameFromContentDisposition = (value: string | null): string | null 
 };
 
 const fetchReportBlob = async (
-  url: string
+  url: string,
 ): Promise<{ blob: Blob; filename: string | null }> => {
   const token = getToken();
   const headers: Record<string, string> = {};
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const response = await fetch(url, { method: 'GET', headers });
+  const response = await fetch(url, { method: "GET", headers });
   if (!response.ok) {
-    const text = await response.text().catch(() => '');
+    const text = await response.text().catch(() => "");
     try {
       const parsed = JSON.parse(text) as { message?: string };
-      throw new Error(parsed?.message || 'Request failed');
+      throw new Error(parsed?.message || "Request failed");
     } catch {
-      throw new Error(text || 'Request failed');
+      throw new Error(text || "Request failed");
     }
   }
 
   const blob = await response.blob();
-  const filename = getFilenameFromContentDisposition(response.headers.get('content-disposition'));
+  const filename = getFilenameFromContentDisposition(
+    response.headers.get("content-disposition"),
+  );
   return { blob, filename };
 };
 
@@ -228,7 +246,10 @@ export const downloadDriverPatientReport = async (params: {
   return fetchReportBlob(`${ROOT_API_URL}/report/driver-patient?${qs}`);
 };
 
-export const downloadTotalPatientReport = async (params: { fromDate: string; toDate: string }) => {
+export const downloadTotalPatientReport = async (params: {
+  fromDate: string;
+  toDate: string;
+}) => {
   const qs = new URLSearchParams({
     fromDate: params.fromDate,
     toDate: params.toDate,
@@ -236,7 +257,10 @@ export const downloadTotalPatientReport = async (params: { fromDate: string; toD
   return fetchReportBlob(`${ROOT_API_URL}/report/total-patient?${qs}`);
 };
 
-export const downloadDriverRevenueReport = async (params: { fromDate: string; toDate: string }) => {
+export const downloadDriverRevenueReport = async (params: {
+  fromDate: string;
+  toDate: string;
+}) => {
   const qs = new URLSearchParams({
     fromDate: params.fromDate,
     toDate: params.toDate,
@@ -244,7 +268,10 @@ export const downloadDriverRevenueReport = async (params: { fromDate: string; to
   return fetchReportBlob(`${ROOT_API_URL}/report/driver-revenue?${qs}`);
 };
 
-export const downloadDailyPatientReport = async (params: { fromDate: string; toDate: string }) => {
+export const downloadDailyPatientReport = async (params: {
+  fromDate: string;
+  toDate: string;
+}) => {
   const qs = new URLSearchParams({
     fromDate: params.fromDate,
     toDate: params.toDate,
@@ -253,12 +280,17 @@ export const downloadDailyPatientReport = async (params: { fromDate: string; toD
 };
 
 // --- Export to Excel ---
-export const exportToExcelPatient = async (params?: { fromDate?: string; toDate?: string }) => {
+export const exportToExcelPatient = async (params?: {
+  fromDate?: string;
+  toDate?: string;
+}) => {
   const qs = new URLSearchParams();
-  if (params?.fromDate) qs.append('fromDate', params.fromDate);
-  if (params?.toDate) qs.append('toDate', params.toDate);
-  const suffix = qs.toString() ? `?${qs.toString()}` : '';
-  return fetchReportBlob(`${ROOT_API_URL}/report/export-to-excel-patient${suffix}`);
+  if (params?.fromDate) qs.append("fromDate", params.fromDate);
+  if (params?.toDate) qs.append("toDate", params.toDate);
+  const suffix = qs.toString() ? `?${qs.toString()}` : "";
+  return fetchReportBlob(
+    `${ROOT_API_URL}/report/export-to-excel-patient${suffix}`,
+  );
 };
 
 export const exportToExcelDrivers = async (params?: {
@@ -269,13 +301,17 @@ export const exportToExcelDrivers = async (params?: {
   isApproved?: boolean;
 }) => {
   const qs = new URLSearchParams();
-  if (params?.fromDate) qs.append('fromDate', params.fromDate);
-  if (params?.toDate) qs.append('toDate', params.toDate);
-  if (params?.search) qs.append('search', params.search);
-  if (params?.isAvailable !== undefined) qs.append('isAvailable', String(params.isAvailable));
-  if (params?.isApproved !== undefined) qs.append('isApproved', String(params.isApproved));
-  const suffix = qs.toString() ? `?${qs.toString()}` : '';
-  return fetchReportBlob(`${ROOT_API_URL}/report/export-to-excel-drivers${suffix}`);
+  if (params?.fromDate) qs.append("fromDate", params.fromDate);
+  if (params?.toDate) qs.append("toDate", params.toDate);
+  if (params?.search) qs.append("search", params.search);
+  if (params?.isAvailable !== undefined)
+    qs.append("isAvailable", String(params.isAvailable));
+  if (params?.isApproved !== undefined)
+    qs.append("isApproved", String(params.isApproved));
+  const suffix = qs.toString() ? `?${qs.toString()}` : "";
+  return fetchReportBlob(
+    `${ROOT_API_URL}/report/export-to-excel-drivers${suffix}`,
+  );
 };
 
 export const exportToExcelRidesReport = async (params?: {
@@ -285,12 +321,14 @@ export const exportToExcelRidesReport = async (params?: {
   rideStatus?: string;
 }) => {
   const qs = new URLSearchParams();
-  if (params?.fromDate) qs.append('fromDate', params.fromDate);
-  if (params?.toDate) qs.append('toDate', params.toDate);
-  if (params?.search) qs.append('search', params.search);
-  if (params?.rideStatus) qs.append('rideStatus', params.rideStatus);
-  const suffix = qs.toString() ? `?${qs.toString()}` : '';
-  return fetchReportBlob(`${ROOT_API_URL}/report/export-to-excel-rides-report${suffix}`);
+  if (params?.fromDate) qs.append("fromDate", params.fromDate);
+  if (params?.toDate) qs.append("toDate", params.toDate);
+  if (params?.search) qs.append("search", params.search);
+  if (params?.rideStatus) qs.append("rideStatus", params.rideStatus);
+  const suffix = qs.toString() ? `?${qs.toString()}` : "";
+  return fetchReportBlob(
+    `${ROOT_API_URL}/report/export-to-excel-rides-report${suffix}`,
+  );
 };
 
 // --- Coupons ---
@@ -316,36 +354,47 @@ export interface UpdateCouponRequest {
 }
 
 export const getAllCoupons = async (): Promise<CouponsResponse> => {
-  return rootApiCall<CouponsResponse>('/coupon/getAllCoupons', {
-    method: 'GET',
+  return rootApiCall<CouponsResponse>("/coupon/getAllCoupons", {
+    method: "GET",
   });
 };
 
-export const getCouponById = async (id: string): Promise<CouponDetailResponse> => {
+export const getCouponById = async (
+  id: string,
+): Promise<CouponDetailResponse> => {
   return rootApiCall<CouponDetailResponse>(`/coupon/getCouponById?id=${id}`, {
-    method: 'GET',
+    method: "GET",
   });
 };
 
-export const addCoupon = async (body: AddCouponRequest): Promise<CouponDetailResponse> => {
-  return rootApiCall<CouponDetailResponse>('/coupon/addCoupon', {
-    method: 'POST',
+export const addCoupon = async (
+  body: AddCouponRequest,
+): Promise<CouponDetailResponse> => {
+  return rootApiCall<CouponDetailResponse>("/coupon/addCoupon", {
+    method: "POST",
     body: JSON.stringify(body),
   });
 };
 
-export const updateCoupon = async (body: UpdateCouponRequest): Promise<CouponDetailResponse> => {
-  return rootApiCall<CouponDetailResponse>('/coupon/updateCoupon', {
-    method: 'PUT',
+export const updateCoupon = async (
+  body: UpdateCouponRequest,
+): Promise<CouponDetailResponse> => {
+  return rootApiCall<CouponDetailResponse>("/coupon/updateCoupon", {
+    method: "PUT",
     body: JSON.stringify(body),
   });
 };
 
-export const deleteCoupon = async (id: string): Promise<{ code: number; message: string; data?: Coupon }> => {
-  return rootApiCall<{ code: number; message: string; data?: Coupon }>('/coupon/deleteCoupon', {
-    method: 'DELETE',
-    body: JSON.stringify({ id }),
-  });
+export const deleteCoupon = async (
+  id: string,
+): Promise<{ code: number; message: string; data?: Coupon }> => {
+  return rootApiCall<{ code: number; message: string; data?: Coupon }>(
+    "/coupon/deleteCoupon",
+    {
+      method: "DELETE",
+      body: JSON.stringify({ id }),
+    },
+  );
 };
 
 // Update driver approval status
@@ -361,79 +410,91 @@ export interface UpdateDriverApprovalResponse {
 }
 
 export const updateDriverApprovalStatus = async (
-  request: UpdateDriverApprovalRequest
+  request: UpdateDriverApprovalRequest,
 ): Promise<UpdateDriverApprovalResponse> => {
-  return apiCall<UpdateDriverApprovalResponse>('/driver/updateDriverApprovalstatus', {
-    method: 'PUT',
-    body: JSON.stringify(request),
-  });
+  return apiCall<UpdateDriverApprovalResponse>(
+    "/driver/updateDriverApprovalstatus",
+    {
+      method: "PUT",
+      body: JSON.stringify(request),
+    },
+  );
 };
 
 // Update payment status
 export const updatePaymentStatus = async (
   orderId: string,
   paymentStatus: string,
-  paymentMode: string
+  paymentMode: string,
 ): Promise<{ code: number; message: string; data?: any }> => {
-  return apiCall<{ code: number; message: string; data?: any }>('/rideOrder/updatePaymentStatus', {
-    method: 'PUT',
-    body: JSON.stringify({ orderId, paymentStatus, paymentMode }),
-  });
+  return apiCall<{ code: number; message: string; data?: any }>(
+    "/rideOrder/updatePaymentStatus",
+    {
+      method: "PUT",
+      body: JSON.stringify({ orderId, paymentStatus, paymentMode }),
+    },
+  );
 };
 
 // Close ride
-export const closeRide = async (orderId: string, driverId: string): Promise<{ code: number; message: string; data?: any }> => {
-  return apiCall<{ code: number; message: string; data?: any }>('/rideOrder/closeRide', {
-    method: 'PUT',
-    body: JSON.stringify({ orderId, driverId }),
-  });
+export const closeRide = async (
+  orderId: string,
+  driverId: string,
+): Promise<{ code: number; message: string; data?: any }> => {
+  return apiCall<{ code: number; message: string; data?: any }>(
+    "/rideOrder/closeRide",
+    {
+      method: "PUT",
+      body: JSON.stringify({ orderId, driverId }),
+    },
+  );
 };
 
 // Get all rides
-export const getAllRides = async (
-  params?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    rideStatus?: string;
-    fromDate?: string;
-    toDate?: string;
-  }
-): Promise<RidesResponse> => {
+export const getAllRides = async (params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  rideStatus?: string;
+  fromDate?: string;
+  toDate?: string;
+}): Promise<RidesResponse> => {
   const queryParams = new URLSearchParams();
 
   if (params?.page !== undefined) {
-    queryParams.append('page', params.page.toString());
+    queryParams.append("page", params.page.toString());
   }
   if (params?.limit !== undefined) {
-    queryParams.append('limit', params.limit.toString());
+    queryParams.append("limit", params.limit.toString());
   }
   if (params?.search) {
-    queryParams.append('search', params.search);
+    queryParams.append("search", params.search);
   }
   if (params?.rideStatus) {
-    queryParams.append('rideStatus', params.rideStatus);
+    queryParams.append("rideStatus", params.rideStatus);
   }
   if (params?.fromDate) {
-    queryParams.append('fromDate', params.fromDate);
+    queryParams.append("fromDate", params.fromDate);
   }
   if (params?.toDate) {
-    queryParams.append('toDate', params.toDate);
+    queryParams.append("toDate", params.toDate);
   }
 
   const queryString = queryParams.toString();
-  const endpoint = `/rideOrder/getAllRides${queryString ? `?${queryString}` : ''}`;
+  const endpoint = `/rideOrder/getAllRides${queryString ? `?${queryString}` : ""}`;
 
   return apiCall<RidesResponse>(endpoint, {
-    method: 'GET',
+    method: "GET",
   });
 };
 
 // Get ride by order ID (full detail)
-export const getRideByOrderId = async (orderId: string): Promise<RideDetailResponse> => {
+export const getRideByOrderId = async (
+  orderId: string,
+): Promise<RideDetailResponse> => {
   return apiCall<RideDetailResponse>(
     `/rideOrder/getRideStatus?orderId=${encodeURIComponent(orderId)}`,
-    { method: 'GET' }
+    { method: "GET" },
   );
 };
 
@@ -446,14 +507,14 @@ export interface DeleteResponse {
 
 export const deletePatient = async (id: string): Promise<DeleteResponse> => {
   return apiCall<DeleteResponse>(`/patient/deletepatient?id=${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 };
 
 // Delete driver
 export const deleteDriver = async (id: string): Promise<DeleteResponse> => {
   return apiCall<DeleteResponse>(`/driver/deletedriver?id=${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 };
 
@@ -462,19 +523,28 @@ export const deleteDriver = async (id: string): Promise<DeleteResponse> => {
 export interface AmbulanceTypesListResponse {
   code: number;
   message: string;
-  data: AmbulanceType[] | { ambulanceTypes?: AmbulanceType[]; list?: AmbulanceType[]; total?: number };
+  data:
+    | AmbulanceType[]
+    | {
+        ambulanceTypes?: AmbulanceType[];
+        list?: AmbulanceType[];
+        total?: number;
+      };
 }
 
-export const getAllAmbulanceTypes = async (
-  params?: { pageNo?: number; pageSize?: number }
-): Promise<AmbulanceTypesListResponse> => {
+export const getAllAmbulanceTypes = async (params?: {
+  pageNo?: number;
+  pageSize?: number;
+}): Promise<AmbulanceTypesListResponse> => {
   const queryParams = new URLSearchParams();
-  if (params?.pageNo !== undefined) queryParams.append('pageNo', params.pageNo.toString());
-  if (params?.pageSize !== undefined) queryParams.append('pageSize', params.pageSize.toString());
+  if (params?.pageNo !== undefined)
+    queryParams.append("pageNo", params.pageNo.toString());
+  if (params?.pageSize !== undefined)
+    queryParams.append("pageSize", params.pageSize.toString());
   const qs = queryParams.toString();
   return apiCall<AmbulanceTypesListResponse>(
-    `/ambulanceType/getAllambulanceType${qs ? `?${qs}` : ''}`,
-    { method: 'GET' }
+    `/ambulanceType/getAllambulanceType${qs ? `?${qs}` : ""}`,
+    { method: "GET" },
   );
 };
 
@@ -488,10 +558,10 @@ export interface AddAmbulanceTypeRequest {
 }
 
 export const addAmbulanceType = async (
-  body: AddAmbulanceTypeRequest
+  body: AddAmbulanceTypeRequest,
 ): Promise<DeleteResponse> => {
-  return apiCall<DeleteResponse>('/ambulanceType/addAmbulanceType', {
-    method: 'POST',
+  return apiCall<DeleteResponse>("/ambulanceType/addAmbulanceType", {
+    method: "POST",
     body: JSON.stringify(body),
   });
 };
@@ -507,10 +577,10 @@ export interface UpdateAmbulanceTypeRequest {
 }
 
 export const updateAmbulanceType = async (
-  body: UpdateAmbulanceTypeRequest
+  body: UpdateAmbulanceTypeRequest,
 ): Promise<DeleteResponse> => {
-  return apiCall<DeleteResponse>('/ambulanceType/updateAmbulanceType', {
-    method: 'PUT',
+  return apiCall<DeleteResponse>("/ambulanceType/updateAmbulanceType", {
+    method: "PUT",
     body: JSON.stringify(body),
   });
 };
@@ -521,10 +591,10 @@ export interface ToggleAmbulanceTypeRequest {
 }
 
 export const toggleAmbulanceType = async (
-  body: ToggleAmbulanceTypeRequest
+  body: ToggleAmbulanceTypeRequest,
 ): Promise<DeleteResponse> => {
-  return apiCall<DeleteResponse>('/ambulanceType/toggleAmbulanceType', {
-    method: 'PUT',
+  return apiCall<DeleteResponse>("/ambulanceType/toggleAmbulanceType", {
+    method: "PUT",
     body: JSON.stringify(body),
   });
 };
